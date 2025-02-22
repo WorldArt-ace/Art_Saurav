@@ -37,25 +37,25 @@
         </div>
     </nav>
         <section>
-            <div class="main-container">
+           <div class="main-container">
     <div class="image" data-aos="zoom-in-right" data-aos-duration="2500">
         <img id="randomImage" alt="">
     </div>
 </div>
-<style>
-    .main-container {
-        display: flex;
-        justify-content: flex-end; /* Aligns image to the right */
-        padding: 20px;
-    }
 
-    .image img {
-        width: 300px; /* Adjust image width */
-        height: auto; /* Maintain aspect ratio */
-        border-radius: 10px; /* Optional: Rounded corners */
-        box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2); /* Optional: Shadow effect */
-    }
-</style>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Array of image paths
+        const images = ["image1.png", "image2.png", "image3.png", "image4.png"];
+
+        // Select a random image
+        const randomImage = images[Math.floor(Math.random() * images.length)];
+
+        // Set the random image as the source
+        document.getElementById("randomImage").src = randomImage;
+    });
+</script>
+
 
 
                 <div class="content">
