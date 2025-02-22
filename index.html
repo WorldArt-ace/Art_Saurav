@@ -37,9 +37,9 @@
         </div>
     </nav>
         <section>
-            <div class="main-container">
+             <div class="main-container">
                 <div class="image" data-aos="zoom-in-right" data-aos-duration="2500">
-                    <img src="1.png" alt="">
+                    <img src="1.png" alt="" style="height: 300px; width: 300px;">
                 </div>
             
              <div class="content">
@@ -63,14 +63,30 @@
           AOS.init({offset:0});
         </script>
         <script>
-            function hamburg(){
-                const navbar = document.querySelector(".dropdown")
-                navbar.style.transform = "translateY(0px)"
+          function hamburg(){
+                const navbar = document.querySelector(".dropdown");
+                navbar.style.transform = "translateY(0px)";
             }
             function cancel(){
-                const navbar = document.querySelector(".dropdown")
-                navbar.style.transform = "translateY(-500px)"
+                const navbar = document.querySelector(".dropdown");
+                navbar.style.transform = "translateY(-500px)";
             }
+
+            // Random Image Refresh
+            function changeImage() {
+                const images = [
+                    "1.png",
+                    "2.png",
+                    "3.png",
+                    "4.png"
+                ]; // Replace with actual image paths
+
+                const randomIndex = Math.floor(Math.random() * images.length);
+                document.querySelector(".image img").src = images[randomIndex];
+            }
+
+            // Refresh the image on load
+            window.onload = changeImage;
         </script>
 </body>
 </html>
