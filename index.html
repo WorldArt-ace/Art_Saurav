@@ -62,7 +62,6 @@
             color: var(--text-color);
             font-size: 2rem;
             display: none;
-            z-index: 1000; /* Ensure icons are above other elements */
         }
 
         .nav-container .links {
@@ -418,12 +417,12 @@
         // Toggle dropdown menu
         function hamburg() {
             const navbar = document.querySelector(".dropdown");
-            navbar.classList.add("active"); // Show dropdown
+            navbar.style.transform = "translateY(0px)";
         }
 
         function cancel() {
             const navbar = document.querySelector(".dropdown");
-            navbar.classList.remove("active"); // Hide dropdown
+            navbar.style.transform = "translateY(-500px)";
         }
 
         // Random Image Refresh
