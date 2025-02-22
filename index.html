@@ -155,11 +155,13 @@
 
         .main-container .image {
             z-index: -1;
-            width: 50%;
+            width: 40%; /* Adjust this value for desktop */
+            max-width: 400px; /* Limit maximum size on larger screens */
         }
 
         .main-container .image img {
             width: 100%;
+            height: auto; /* Maintain aspect ratio */
         }
 
         .main-container .content {
@@ -312,8 +314,8 @@
             }
 
             .main-container .image {
-                width: 80%;
-                margin-bottom: 0px;
+                width: 80%; /* Adjust this value for mobile */
+                max-width: 300px; /* Limit maximum size on smaller screens */
             }
         }
     </style>
@@ -350,7 +352,7 @@
     <section>
         <div class="main-container">
             <div class="image" data-aos="zoom-in-right" data-aos-duration="2500">
-                <img src="1.png" alt="" style="height: 400px; width: 400px;">
+                <img src="1.png" alt="">
             </div>
             <div class="content">
                 <h1 data-aos="fade-left" data-aos-duration="1000" data-aos-delay="800">Hey I'm <span>Saurav</span></h1>
