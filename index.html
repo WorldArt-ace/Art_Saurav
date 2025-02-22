@@ -22,7 +22,7 @@
 
         body {
             width: 100%;
-            height: 100vh;
+            min-height: 100vh;
             overflow: hidden;
             background: linear-gradient(to right, var(--color1), var(--color2));
         }
@@ -142,34 +142,39 @@
 
         section {
             width: 100%;
-            height: 90vh;
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .main-container {
             width: 100%;
-            height: 100%;
+            max-width: 1200px;
             display: flex;
             justify-content: space-evenly;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .main-container .image {
-            z-index: -1;
             width: 50%;
+            max-width: 400px;
         }
 
         .main-container .image img {
             width: 100%;
+            height: auto;
         }
 
         .main-container .content {
             color: var(--text-color);
             width: 40%;
-            min-height: 100px;
+            min-width: 300px;
         }
 
         .content h1 {
-            font-size: clamp(1rem, 2rem + 5vw, 3rem);
+            font-size: clamp(1.5rem, 5vw, 3rem);
         }
 
         .content h1 span {
@@ -179,7 +184,7 @@
 
         .content .typewriter {
             font-weight: 600;
-            font-size: clamp(1rem, 1rem + 5vw, 2rem);
+            font-size: clamp(1rem, 3vw, 2rem);
         }
 
         .content .typewriter span {
@@ -223,7 +228,7 @@
         }
 
         .content p {
-            font-size: clamp(0.4rem, 0.2rem + 9vw, 1rem);
+            font-size: clamp(0.8rem, 2vw, 1rem);
             margin: 10px 0;
         }
 
@@ -251,6 +256,7 @@
 
         .content button {
             width: 40%;
+            max-width: 200px;
             height: 6vh;
             margin: 30px;
             background-color: var(--accent-color);
@@ -285,8 +291,8 @@
             }
 
             .main-container {
-                display: flex;
                 flex-direction: column;
+                text-align: center;
             }
 
             .nav-container .links {
@@ -313,7 +319,7 @@
 
             .main-container .image {
                 width: 80%;
-                margin-bottom: 0px;
+                margin-bottom: 20px;
             }
         }
     </style>
@@ -350,7 +356,7 @@
     <section>
         <div class="main-container">
             <div class="image" data-aos="zoom-in-right" data-aos-duration="2500">
-                <img src="1.png" alt="" style="height: 400px; width: 400px;">
+                <img src="1.png" alt="">
             </div>
             <div class="content">
                 <h1 data-aos="fade-left" data-aos-duration="1000" data-aos-delay="800">Hey I'm <span>Saurav</span></h1>
