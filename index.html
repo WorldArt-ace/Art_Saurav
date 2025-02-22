@@ -10,10 +10,24 @@
 </head>
 <body>
     <nav>
-        <div class="nav-container">
-            <div class="logo" data-aos="zoom-in" data-aos-duration="1000">
-                <span>Amelia</span>
-            </div>
+        <div class="main-container">
+    <div class="image" data-aos="zoom-in-right" data-aos-duration="2500">
+        <img id="randomImage" alt="">
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Array of image paths
+        const images = ["image1.png", "image2.png", "image3.png", "image4.png"];
+
+        // Select a random image
+        const randomImage = images[Math.floor(Math.random() * images.length)];
+
+        // Set the random image as the source
+        document.getElementById("randomImage").src = randomImage;
+    });
+</script>
             <div class="links">
                 <div class="link" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="100"><a href="#">Home</a></div>
                 <div class="link" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="200"><a href="#">About</a></div>
