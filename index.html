@@ -24,7 +24,7 @@
             width: 100%;
             height: 100vh;
             overflow: hidden;
-            background: linear-gradient(to right, rgb(255, 255, 255), rgb(254, 215, 173));
+            background: linear-gradient(to right, var(--color1), var(--color2));
         }
 
         nav {
@@ -42,14 +42,14 @@
         }
 
         .logo {
-            color: black;
+            color: var(--text-color);
             font-size: 2rem;
             font-weight: bolder;
         }
 
         .logo span {
-            color: rgb(109, 67, 0);
-            text-shadow: 0 0 10px rgb(109, 67, 0);
+            color: var(--accent-color);
+            text-shadow: 0 0 10px var(--accent-color);
         }
 
         .hamburg, .cancel {
@@ -57,7 +57,7 @@
             position: absolute;
             right: 15px;
             top: 10px;
-            color: black;
+            color: var(--text-color);
             font-size: 2rem;
             display: none;
         }
@@ -71,7 +71,7 @@
         .nav-container .links a {
             position: relative;
             font-size: 1.2rem;
-            color: black;
+            color: var(--text-color);
             text-decoration: none;
             font-weight: 500;
             transform: 0.3s linear;
@@ -84,7 +84,7 @@
             left: 0;
             width: 0%;
             height: 3px;
-            background-color: rgb(109, 67, 0);
+            background-color: var(--accent-color);
             transition: 0.2s linear;
         }
 
@@ -96,7 +96,7 @@
             background-color: transparent;
             padding: 5px 20px;
             border-radius: 20px;
-            border: 2px solid rgb(109, 67, 0);
+            border: 2px solid var(--accent-color);
             transition: 0.2s linear;
         }
 
@@ -106,12 +106,12 @@
         }
 
         .nav-container .contact-btn:hover, .nav-container .contact-btn:hover a {
-            background-color: rgb(109, 67, 0);
+            background-color: var(--accent-color);
             color: white;
         }
 
         .nav-container .links a:hover {
-            color: rgb(109, 67, 0);
+            color: var(--accent-color);
         }
 
         .dropdown {
@@ -137,7 +137,7 @@
         }
 
         .dropdown .links a:hover {
-            background-color: rgb(109, 67, 0);
+            background-color: var(--accent-color);
         }
 
         section {
@@ -155,17 +155,15 @@
 
         .main-container .image {
             z-index: -1;
-            width: 40%; /* Adjust this value for desktop */
-            max-width: 400px; /* Limit maximum size on larger screens */
+            width: 50%;
         }
 
         .main-container .image img {
             width: 100%;
-            height: auto; /* Maintain aspect ratio */
         }
 
         .main-container .content {
-            color: black;
+            color: var(--text-color);
             width: 40%;
             min-height: 100px;
         }
@@ -175,8 +173,8 @@
         }
 
         .content h1 span {
-            color: rgb(109, 67, 0);
-            text-shadow: 0 0 10px rgb(109, 67, 0);
+            color: var(--accent-color);
+            text-shadow: 0 0 10px var(--accent-color);
         }
 
         .content .typewriter {
@@ -185,9 +183,9 @@
         }
 
         .content .typewriter span {
-            color: rgb(109, 67, 0);
+            color: var(--accent-color);
             font-size: 2.5rem;
-            text-shadow: 0 0 5px rgb(109, 67, 0);
+            text-shadow: 0 0 5px var(--accent-color);
             position: relative;
             transition: 0.3s linear;
         }
@@ -202,13 +200,13 @@
             position: absolute;
             width: calc(100% + 8px);
             height: 100%;
-            border-left: 3px solid black;
+            border-left: 3px solid var(--text-color);
             animation: cursor 0.6s linear infinite;
         }
 
         @keyframes cursor {
             to {
-                border-left: 3px solid #b74b4b;
+                border-left: 3px solid var(--accent-color);
             }
         }
 
@@ -236,9 +234,9 @@
             width: 3rem;
             height: 3rem;
             background-color: transparent;
-            border: 0.2rem solid rgb(109, 67, 0);
+            border: 0.2rem solid var(--accent-color);
             border-radius: 50%;
-            color: rgb(109, 67, 0);
+            color: var(--accent-color);
             margin: 5px 10px;
             font-size: 1.5rem;
             transition: 0.2s linear;
@@ -247,15 +245,15 @@
         .social-links i:hover {
             scale: 1.3;
             color: white;
-            background-color: rgb(109, 67, 0);
-            filter: drop-shadow(0 0 10px rgb(109, 67, 0));
+            background-color: var(--accent-color);
+            filter: drop-shadow(0 0 10px var(--accent-color));
         }
 
         .content button {
             width: 40%;
             height: 6vh;
             margin: 30px;
-            background-color: rgb(109, 67, 0);
+            background-color: var(--accent-color);
             color: white;
             border: none;
             outline: none;
@@ -267,11 +265,11 @@
 
         .content button:hover {
             scale: 1.1;
-            color: rgb(109, 67, 0);
-            border: 2px solid rgb(109, 67, 0);
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
             background-color: transparent;
             font-weight: 700;
-            box-shadow: 0 0 40px rgb(109, 67, 0);
+            box-shadow: 0 0 40px var(--accent-color);
         }
 
         @media (max-width: 884px) {
@@ -314,8 +312,8 @@
             }
 
             .main-container .image {
-                width: 80%; /* Adjust this value for mobile */
-                max-width: 300px; /* Limit maximum size on smaller screens */
+                width: 80%;
+                margin-bottom: 0px;
             }
         }
     </style>
@@ -352,7 +350,7 @@
     <section>
         <div class="main-container">
             <div class="image" data-aos="zoom-in-right" data-aos-duration="2500">
-                <img src="1.png" alt="">
+                <img src="1.png" alt="" style="height: 400px; width: 400px;">
             </div>
             <div class="content">
                 <h1 data-aos="fade-left" data-aos-duration="1000" data-aos-delay="800">Hey I'm <span>Saurav</span></h1>
@@ -375,6 +373,33 @@
     <script>
         // Initialize AOS (Animate On Scroll)
         AOS.init({ offset: 0 });
+
+        // Function to generate light colors
+        function getLightColor() {
+            const hue = Math.floor(Math.random() * 360); // Random hue
+            const saturation = Math.floor(Math.random() * 30) + 70; // 70-100% saturation
+            const lightness = Math.floor(Math.random() * 20) + 70; // 70-90% lightness
+            return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+        }
+
+        // Apply light colors to the website
+        function applyLightColors() {
+            const color1 = getLightColor();
+            const color2 = getLightColor();
+            const accentColor = getLightColor();
+            const textColor = '#333'; // Darker text for contrast
+
+            document.documentElement.style.setProperty('--color1', color1);
+            document.documentElement.style.setProperty('--color2', color2);
+            document.documentElement.style.setProperty('--accent-color', accentColor);
+            document.documentElement.style.setProperty('--text-color', textColor);
+        }
+
+        // Apply light colors on page load
+        window.onload = function() {
+            applyLightColors();
+            changeImage(); // Call the image change function
+        };
 
         // Toggle dropdown menu
         function hamburg() {
@@ -399,9 +424,6 @@
             const randomIndex = Math.floor(Math.random() * images.length);
             document.querySelector(".image img").src = images[randomIndex];
         }
-
-        // Refresh the image on load
-        window.onload = changeImage;
     </script>
 </body>
 </html>
