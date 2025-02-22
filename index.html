@@ -31,6 +31,8 @@
             width: 100%;
             height: 10vh;
             position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .nav-container {
@@ -119,12 +121,16 @@
             z-index: 100;
             position: absolute;
             top: 0;
-            transform: translateY(-500px);
+            transform: translateY(-100%); /* Start off-screen */
             width: 100%;
             height: auto;
             backdrop-filter: brightness(40%) blur(3px);
             box-shadow: 0 0 20px black;
-            transition: 0.2s linear;
+            transition: transform 0.3s ease-in-out; /* Smooth transition */
+        }
+
+        .dropdown.active {
+            transform: translateY(0); /* Show dropdown */
         }
 
         .dropdown .links a {
@@ -412,12 +418,12 @@
         // Toggle dropdown menu
         function hamburg() {
             const navbar = document.querySelector(".dropdown");
-            navbar.style.transform = "translateY(0px)";
+            navbar.classList.add("active"); // Show dropdown
         }
 
         function cancel() {
             const navbar = document.querySelector(".dropdown");
-            navbar.style.transform = "translateY(-500px)";
+            navbar.classList.remove("active"); // Hide dropdown
         }
 
         // Random Image Refresh
