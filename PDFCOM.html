@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Compress PDF files online with ease. Choose your compression level and optimize images for smaller file sizes.">
+    <meta name="keywords" content="PDF compression, compress PDF, optimize PDF, image optimization">
+    <meta name="author" content="Your Name">
+    <title>PDF Compression Tool</title>
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background: #007BFF;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-input-label {
+            display: block;
+            background: #007BFF;
+            color: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.3s ease;
+        }
+
+        .file-input-label:hover {
+            background: #0056b3;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #333;
+            background: #f9f9f9;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #output {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        #output a {
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        #output a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        footer {
+            background: #007BFF;
+            color: #fff;
+            text-align: center;
+            padding: 15px;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: auto;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 24px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+
+            button {
+                font-size: 14px;
+            }
+
+            footer p {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <h1>PDF Compression Tool</h1>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <h2>Compress Your PDF</h2>
+            <form id="pdfForm">
+                <div class="form-group">
+                    <label for="pdfFile">Choose PDF File:</label>
+                    <label for="pdfFile" class="file-input-label">Select File</label>
+                    <input type="file" id="pdfFile" accept="application/pdf" required>
+                </div>
+                <div class="form-group">
+                    <label for="compressionLevel">Compression Level:</label>
+                    <select id="compressionLevel">
+                        <option value="0.1">Low</option>
+                        <option value="0.5" selected>Medium</option>
+                        <option value="0.9">High</option>
+                    </select>
+                </div>
+                <button type="submit">Compress PDF</button>
+            </form>
+            <div id="output"></div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2023 PDF Compression Tool. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // JavaScript for Functionality
+        document.getElementById('pdfForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const fileInput = document.getElementById('pdfFile');
+            const compressionLevel = parseFloat(document.getElementById('compressionLevel').value);
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert('Please select a PDF file.');
+                return;
+            }
+
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = '<p>Compressing PDF... Please wait.</p>';
+
+            try {
+                const pdfBytes = await file.arrayBuffer();
+                const pdfDoc = await PDFLib.PDFDocument.load(pdfBytes);
+
+                // Optimize images in the PDF
+                const pages = pdfDoc.getPages();
+                for (let i = 0; i < pages.length; i++) {
+                    const page = pages[i];
+                    const images = await page.getImages();
+                    for (let j = 0; j < images.length; j++) {
+                        const image = images[j];
+                        const imageBytes = await image.getImageBytes();
+                        const compressedImage = await imageCompression(imageBytes, { maxSizeMB: compressionLevel });
+                        const newImage = await pdfDoc.embedJpg(compressedImage);
+                        page.drawImage(newImage, { x: 0, y: 0, width: page.getWidth(), height: page.getHeight() });
+                    }
+                }
+
+                const compressedPdfBytes = await pdfDoc.save();
+                const compressedPdfBlob = new Blob([compressedPdfBytes], { type: 'application/pdf' });
+                const downloadUrl = URL.createObjectURL(compressedPdfBlob);
+
+                outputDiv.innerHTML = `
+                    <p>PDF compressed successfully!</p>
+                    <a href="${downloadUrl}" download="compressed.pdf">Download Compressed PDF</a>
+                `;
+            } catch (error) {
+                outputDiv.innerHTML = `<p style="color: #ff0000;">Error: ${error.message}</p>`;
+            }
+        });
+
+        async function imageCompression(imageBytes, options) {
+            const blob = new Blob([imageBytes], { type: 'image/jpeg' });
+            const file = new File([blob], 'image.jpg', { type: 'image/jpeg' });
+            return await browserImageCompression(file, options);
+        }
+    </script>
+
+    <!-- External Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/browser-image-compression/2.0.0/browser-image-compression.min.js"></script>
+</body>
+</html>
