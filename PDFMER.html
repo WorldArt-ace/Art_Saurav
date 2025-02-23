@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Merge Tool | Merge & Compress PDFs Online</title>
+    <meta name="description" content="Merge multiple PDF files into one with adjustable compression and image optimization. Free online PDF merger tool with responsive design.">
+    <meta name="keywords" content="PDF merge, combine PDFs, PDF compression, image optimization, online tool">
+    <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/compressorjs@1.0.9/dist/compressor.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: #f0f2f5;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 2rem;
+        }
+
+        .upload-section {
+            text-align: center;
+            border: 2px dashed #3498db;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            background: #f8f9fa;
+            border-color: #2980b9;
+        }
+
+        .custom-file-input {
+            background: #3498db;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+
+        .custom-file-input:hover {
+            background: #2980b9;
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        .selected-files {
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+
+        .file-item {
+            background: #f8f9fa;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .controls {
+            display: grid;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        select, label {
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        button {
+            background: #27ae60;
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #219a52;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                padding: 1rem;
+            }
+            
+            .upload-section {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Merge PDF Files</h1>
+        <div class="upload-section">
+            <input type="file" id="file-input" multiple accept=".pdf,image/*">
+            <label for="file-input" class="custom-file-input">Choose Files</label>
+            <p>Select PDFs or images to merge</p>
+            <div class="selected-files" id="file-list"></div>
+        </div>
+
+        <div class="controls">
+            <select id="compression">
+                <option value="low">Low Compression</option>
+                <option value="medium" selected>Medium Compression</option>
+                <option value="high">High Compression</option>
+            </select>
+
+            <label>
+                <input type="checkbox" id="optimize-images" checked>
+                Optimize Images
+            </label>
+
+            <button onclick="mergePDFs()">Merge PDFs</button>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('file-input');
+        const fileList = document.getElementById('file-list');
+
+        fileInput.addEventListener('change', updateFileList);
+
+        function updateFileList() {
+            fileList.innerHTML = '';
+            Array.from(fileInput.files).forEach(file => {
+                const div = document.createElement('div');
+                div.className = 'file-item';
+                div.innerHTML = `
+                    <span>${file.name}</span>
+                    <span>${(file.size / 1024).toFixed(2)} KB</span>
+                `;
+                fileList.appendChild(div);
+            });
+        }
+
+        async function mergePDFs() {
+            const files = Array.from(fileInput.files);
+            if (files.length === 0) {
+                alert('Please select files to merge.');
+                return;
+            }
+
+            const compressionLevel = document.getElementById('compression').value;
+            const optimizeImages = document.getElementById('optimize-images').checked;
+
+            try {
+                const { PDFDocument } = PDFLib;
+                const mergedPdf = await PDFDocument.create();
+                
+                for (const file of files) {
+                    if (file.type === 'application/pdf') {
+                        const arrayBuffer = await file.arrayBuffer();
+                        const pdf = await PDFDocument.load(arrayBuffer);
+                        const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                        pages.forEach(page => mergedPdf.addPage(page));
+                    } else if (file.type.startsWith('image/')) {
+                        const compressedImage = await new Promise((resolve, reject) => {
+                            if (!optimizeImages) {
+                                resolve(file);
+                                return;
+                            }
+                            new Compressor(file, {
+                                quality: getCompressionQuality(compressionLevel),
+                                mimeType: 'image/jpeg',
+                                success: resolve,
+                                error: reject,
+                            });
+                        });
+
+                        const imageUrl = await readFileAsDataURL(compressedImage);
+                        const image = await mergedPdf.embedJpg(imageUrl);
+                        const page = mergedPdf.addPage([image.width, image.height]);
+                        page.drawImage(image, { x: 0, y: 0 });
+                    }
+                }
+
+                const pdfBytes = await mergedPdf.save({
+                    compress: true,
+                });
+
+                downloadPDF(pdfBytes);
+            } catch (error) {
+                alert('Error merging files: ' + error.message);
+            }
+        }
+
+        function getCompressionQuality(level) {
+            switch (level) {
+                case 'high': return 0.4;
+                case 'medium': return 0.6;
+                default: return 0.8;
+            }
+        }
+
+        function readFileAsDataURL(file) {
+            return new Promise((resolve) => {
+                const reader = new FilSeReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function downloadPDF(pdfBytes) {
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'merged-document.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
