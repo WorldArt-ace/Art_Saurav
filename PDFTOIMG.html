@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Convert PDF to optimized images online. Extract high-quality images from PDF files with adjustable compression levels. Free and fast PDF to image converter.">
+    <meta name="keywords" content="PDF to Image, PDF Converter, Image Extractor, PDF Optimizer">
+    <title>PDF to Image Converter | Extract & Optimize Images from PDF</style></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #45a049;
+            --background: #f5f5f5;
+            --text-color: #333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .converter-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .upload-section {
+            text-align: center;
+            border: 2px dashed #ddd;
+            padding: 3rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .upload-section:hover {
+            border-color: var(--primary-color);
+            background: #f8fff8;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .custom-file-upload {
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .custom-file-upload:hover {
+            background: var(--secondary-color);
+        }
+
+        .settings-section {
+            margin: 1.5rem 0;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .compression-control {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-top: 0.5rem;
+        }
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .image-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .image-preview {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+            background: #f8f8f8;
+        }
+
+        .download-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 1rem;
+            width: 100%;
+            transition: background 0.3s ease;
+        }
+
+        .download-btn:hover {
+            background: var(--secondary-color);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 0.5rem;
+            }
+            
+            .converter-card {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+          <header class="header">
+            <h1>PDF Image Extractor</h1>
+            <p>Convert PDF pages to high-quality images with adjustable compression</p>
+        </header>
+        <div class="converter-card">
+            <div class="upload-section" id="dropZone">
+                <input type="file" class="file-input" id="pdfInput" accept="application/pdf">
+                <label for="pdfInput" class="custom-file-upload">
+                    <i class="fas fa-file-upload"></i>
+                    Choose PDF File
+                </label>
+                <p style="margin-top: 1rem;">or drag and drop files here</p>
+            </div>
+
+            <div class="settings-section">
+                <div class="compression-control">
+                    <label>Compression Level:</label>
+                    <select id="compressionLevel">
+                        <option value="0.9">High Quality</option>
+                        <option value="0.7" selected>Balanced</option>
+                        <option value="0.5">High Compression</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="loading" id="loading">
+                <i class="fas fa-spinner fa-spin"></i> Processing PDF...
+            </div>
+
+            <div class="image-gallery" id="imageGallery"></div>
+            <button class="download-btn" id="downloadAll" style="display: none;">
+                Download All Images (ZIP)
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const loadingElement = document.getElementById('loading');
+        const imageGallery = document.getElementById('imageGallery');
+        const downloadBtn = document.getElementById('downloadAll');
+        const compressionLevel = document.getElementById('compressionLevel');
+        let zip = new JSZip();
+        let imgFolder = zip.folder("extracted-images");
+
+        document.getElementById('pdfInput').addEventListener('change', handleFileSelect);
+        
+        async function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            loadingElement.style.display = 'block';
+            imageGallery.innerHTML = '';
+            downloadBtn.style.display = 'none';
+
+            try {
+                const pdfData = await readFile(file);
+                const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
+                const totalPages = pdf.numPages;
+                const quality = parseFloat(compressionLevel.value);
+
+                for (let i = 1; i <= totalPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const viewport = page.getViewport({ scale: 2 });
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    await page.render({
+                        canvasContext: context,
+                        viewport: viewport
+                    }).promise;
+
+                    const imageData = canvas.toDataURL('image/jpeg', quality);
+                    addImageToGallery(imageData, i);
+                    imgFolder.file(`page-${i}.jpg`, imageData.split(',')[1], { base64: true });
+                }
+
+                downloadBtn.style.display = 'block';
+            } catch (error) {
+                alert('Error processing PDF: ' + error.message);
+            } finally {
+                loadingElement.style.display = 'none';
+            }
+        }
+
+        function addImageToGallery(dataUrl, pageNumber) {
+            const imageCard = document.createElement('div');
+            imageCard.className = 'image-card';
+            imageCard.innerHTML = `
+                <img src="${dataUrl}" class="image-preview" alt="Page ${pageNumber} extract">
+                <div style="padding: 1rem;">
+                    <p>Page ${pageNumber}</p>
+                </div>
+            `;
+            imageGallery.appendChild(imageCard);
+        }
+
+        downloadBtn.addEventListener('click', async () => {
+            const content = await zip.generateAsync({ type: "blob" });
+            saveAs(content, "extracted-images.zip");
+        });
+
+        function readFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // Drag and drop functionality
+        const dropZone = document.getElementById('dropZone');
+        dropZone.ondragover = (e) => {
+            e.preventDefault();
+            dropZone.style.backgroundColor = '#f0fff0';
+        };
+
+        dropZone.ondragleave = () => {
+            dropZone.style.backgroundColor = '';
+        };
+
+        dropZone.ondrop = (e) => {
+            e.preventDefault();
+            dropZone.style.backgroundColor = '';
+            const file = e.dataTransfer.files[0];
+            if (file.type === 'application/pdf') {
+                document.getElementById('pdfInput').files = e.dataTransfer.files;
+                handleFileSelect({ target: document.getElementById('pdfInput') });
+            }
+        };
+    </script>
+</body>
+</html>
