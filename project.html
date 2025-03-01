@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>John Doe | Senior Full Stack Developer Portfolio</title>
+    <meta name="description" content="Award-winning full stack developer with 10+ years experience building enterprise web applications">
+    <meta name="keywords" content="web development, software engineer, React, Node.js, full stack">
+    <meta name="author" content="John Doe">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00ff88;
+            --secondary: #00ccff;
+            --dark: #0a0a0a;
+            --light: #ffffff;
+            --glass: rgba(255,255,255,0.05);
+        }
+
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader-content {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+
+        .loader-spinner {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid transparent;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loader-spinner::after {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            border: 3px solid transparent;
+            border-top-color: var(--secondary);
+            border-radius: 50%;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        body {
+            background: var(--dark);
+            color: var(--light);
+            line-height: 1.6;
+            font-size: 1.1rem;
+        }
+
+        .background-elements {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .floating-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.1;
+            animation: float 20s infinite linear;
+        }
+
+        .grid-lines {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(var(--glass) 1px, transparent 1px),
+                            linear-gradient(90deg, var(--glass) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+            opacity: 0.1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(100px, 100px); }
+            50% { transform: translate(-50px, 150px); }
+            75% { transform: translate(-100px, -50px); }
+        }
+
+        .nav {
+            padding: 1.2rem 5%;
+            background: rgba(10,10,10,0.97);
+            backdrop-filter: blur(15px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .search-bar {
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.05);
+            color: var(--light);
+            width: 300px;
+            transition: all 0.3s ease;
+        }
+
+        .color-picker-btn {
+            background: var(--primary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            margin-left: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .color-picker-btn i {
+            color: var(--dark);
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .color-picker-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 8% 5%;
+            position: relative;
+        }
+
+        .hero-content h1 {
+            font-size: 4.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1;
+        }
+
+        .projects {
+            padding: 5rem 5%;
+        }
+
+        .project-filters {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.8rem 2rem;
+            border-radius: 30px;
+            border: 2px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: var(--dark);
+            box-shadow: 0 0 25px var(--primary);
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .project-card {
+            background: var(--glass);
+            border-radius: 20px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: 0.6s;
+        }
+
+        .project-card:hover::before {
+            left: 100%;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .search-bar { width: 200px; }
+            .projects-grid { grid-template-columns: 1fr; }
+            .color-picker-btn { margin-left: 0.5rem; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes colorWave {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="loader" id="loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <div class="loader-logo">GALAXart STUDIO</div>
+        </div>
+    </div>
+
+    <div class="background-elements">
+        <div class="grid-lines"></div>
+        <div class="floating-circle" style="width: 400px; height: 400px; background: var(--primary); top: 20%; left: 10%"></div>
+        <div class="floating-circle" style="width: 300px; height: 300px; background: var(--secondary); top: 60%; right: 15%"></div>
+    </div>
+
+    <nav class="nav">
+        <div class="logo">GALAXart STUDIO</div>
+        <input type="text" class="search-bar" placeholder="Search projects..." id="searchInput">
+        <button class="color-picker-btn" id="colorPicker">
+            <i class="fas fa-palette"></i>
+        </button>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="animate-fadeIn">Innovative Solutions for Digital Transformation</h1>
+            <p class="animate-fadeIn" style="animation-delay: 0.2s">Senior Full Stack Developer specializing in scalable web applications</p>
+        </div>
+    </section>
+
+    <section class="projects">
+        <div class="project-filters" id="projectFilters">
+            <button class="filter-btn active" data-type="all">All</button>
+            <button class="filter-btn" data-type="web">Web</button>
+            <button class="filter-btn" data-type="mobile">Mobile</button>
+            <button class="filter-btn" data-type="design">Design</button>
+        </div>
+
+        <div class="projects-grid" id="projectsGrid"></div>
+    </section>
+
+    <script>
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1000);
+        });
+
+        const projects = [
+            {
+                title: "E-commerce Platform",
+                type: "web",
+                description: "Full-stack e-commerce solution with React & Node.js",
+                image: "https://source.unsplash.com/random/800x600?ecommerce",
+                tags: ["React", "Node.js", "MongoDB"]
+            },
+            {
+                title: "Fitness Mobile App",
+                type: "mobile",
+                description: "Cross-platform fitness tracking application",
+                image: "https://source.unsplash.com/random/800x600?fitness",
+                tags: ["React Native", "Firebase"]
+            },
+            {
+                title: "Dashboard UI Kit",
+                type: "design",
+                description: "Modern admin dashboard UI design system",
+                image: "https://source.unsplash.com/random/800x600?dashboard",
+                tags: ["Figma", "UI Design"]
+            }
+        ];
+
+        let isDarkTheme = true;
+        const colorPicker = document.getElementById('colorPicker');
+
+        function generateRandomColor() {
+            const hue = Math.floor(Math.random() * 360);
+            const saturation = 70 + Math.floor(Math.random() * 30);
+            const lightness = isDarkTheme ? 50 : 30;
+            return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+        }
+
+        function updateColorScheme() {
+            const primary = generateRandomColor();
+            const secondary = generateRandomColor();
+            
+            document.documentElement.style.setProperty('--primary', primary);
+            document.documentElement.style.setProperty('--secondary', secondary);
+            
+            const wave = document.createElement('div');
+            wave.style.cssText = `
+                position: fixed;
+                width: 100vw;
+                height: 100vh;
+                background: radial-gradient(circle, ${primary} 0%, transparent 70%);
+                pointer-events: none;
+                animation: colorWave 1s ease-out;
+                z-index: 9999;
+            `;
+            document.body.appendChild(wave);
+            setTimeout(() => wave.remove(), 1000);
+            
+            isDarkTheme = !isDarkTheme;
+            localStorage.setItem('colorTheme', JSON.stringify({ primary, secondary }));
+        }
+
+        colorPicker.addEventListener('click', updateColorScheme);
+
+        const savedTheme = localStorage.getItem('colorTheme');
+        if(savedTheme) {
+            const { primary, secondary } = JSON.parse(savedTheme);
+            document.documentElement.style.setProperty('--primary', primary);
+            document.documentElement.style.setProperty('--secondary', secondary);
+        }
+
+        function renderProjects(filteredProjects = projects) {
+            const grid = document.getElementById('projectsGrid');
+            grid.innerHTML = filteredProjects.map(project => `
+                <div class="project-card animate-fadeIn">
+                    <img src="${project.image}" alt="${project.title}" style="width:100%; border-radius:15px; margin-bottom:1rem">
+                    <h3>${project.title}</h3>
+                    <p>${project.description}</p>
+                    <div class="tags">${project.tags.map(tag => `<span style="display:inline-block; background:var(--glass); padding:0.3rem 0.8rem; border-radius:20px; margin:0.3rem">${tag}</span>`).join(' ')}</div>
+                </div>
+            `).join('');
+            
+            document.querySelectorAll('.project-card').forEach(el => observer.observe(el));
+        }
+
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const type = btn.dataset.type;
+                const filtered = type === 'all' ? projects : projects.filter(p => p.type === type);
+                renderProjects(filtered);
+            });
+        });
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtered = projects.filter(p =>
+                p.title.toLowerCase().includes(term) ||
+                p.description.toLowerCase().includes(term) ||
+                p.tags.some(t => t.toLowerCase().includes(term))
+            );
+            renderProjects(filtered);
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    entry.target.classList.add('animate-fadeIn');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.addEventListener('mousemove', (e) => {
+            const circles = document.querySelectorAll('.floating-circle');
+            circles.forEach((circle, index) => {
+                const speed = (index + 1) * 0.5;
+                const x = (e.clientX - window.innerWidth/2) * speed/100;
+                const y = (e.clientY - window.innerHeight/2) * speed/100;
+                circle.style.transform = `translate(${x}px, ${y}px)`;
+            });
+        });
+
+        renderProjects();
+    </script>
+</body>
+</html>
