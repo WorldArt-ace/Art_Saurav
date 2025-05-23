@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Complete Windows 11 Web Interface with File Explorer and Dynamic Day/Night Cycle">
+    <meta name="keywords" content="Windows 11, Web OS, File Explorer, Day Night Cycle, Desktop Environment">
+    <title>Windows 11 Web Interface</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        body {
+            color: #fff;
+            min-height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(
+                180deg,
+                #001528 0%,
+                #003366 25%,
+                #87CEEB 50%,
+                #FFA500 75%,
+                #001528 100%
+            );
+            background-size: 100% 400%;
+            animation: dayNightCycle 24s linear infinite;
+            transition: background-position 1s ease;
+        }
+
+        /* Taskbar */
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            height: 50px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .taskbar-icon {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .taskbar-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Desktop Icons */
+        .desktop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 50px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, 80px);
+            grid-auto-rows: 90px;
+            gap: 15px;
+            align-content: start;
+        }
+
+        .desktop-icon {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 80px;
+            padding: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .desktop-icon:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .desktop-icon i {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        .desktop-icon span {
+            text-align: center;
+            font-size: 12px;
+            word-break: break-word;
+        }
+
+        /* Window Styles */
+        .window {
+            position: absolute;
+            background: rgba(42, 42, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 10px;
+            min-width: 400px;
+            min-height: 300px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: none;
+        }
+
+        .window-header {
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+        }
+
+        .window-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .window-control {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .close { background: #ff5f57; }
+        .minimize { background: #febc2e; }
+        .maximize { background: #28c940; }
+
+        /* Context Menu */
+        .context-menu {
+            position: absolute;
+            background: rgba(42, 42, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 8px;
+            padding: 5px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 2000;
+        }
+
+        .context-menu-item {
+            padding: 8px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .context-menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* File Explorer */
+        .explorer-window {
+            width: 800px;
+            height: 500px;
+        }
+
+        .explorer-sidebar {
+            width: 200px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 0;
+            height: 100%;
+            float: left;
+        }
+
+        .explorer-content {
+            height: 100%;
+            overflow: auto;
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, 100px);
+            grid-auto-rows: 120px;
+            gap: 15px;
+        }
+
+        .explorer-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .explorer-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .explorer-item i {
+            font-size: 40px;
+            margin-bottom: 5px;
+        }
+
+        .explorer-item span {
+            text-align: center;
+            font-size: 12px;
+            word-break: break-word;
+        }
+
+        /* Dialog Windows */
+        .dialog-window {
+            width: 400px;
+        }
+
+        .dialog-content {
+            padding: 20px;
+        }
+
+        .dialog-input {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            color: white;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .dialog-button {
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+        }
+
+        .dialog-primary {
+            background: #0078d7;
+            color: white;
+        }
+
+        /* Time Controls */
+        .time-control {
+            position: fixed;
+            bottom: 60px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            z-index: 1001;
+        }
+
+        .time-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            margin: 2px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .time-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .clock {
+            position: fixed;
+            bottom: 15px;
+            right: 20px;
+            font-size: 0.9em;
+            color: rgba(255, 255, 255, 0.8);
+            z-index: 1000;
+        }
+
+        /* Animations */
+        @keyframes dayNightCycle {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 0% 100%; }
+        }
+
+        @keyframes startMenu {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .window {
+                min-width: 90%;
+                left: 5% !important;
+            }
+            
+            .explorer-window {
+                width: 95%;
+                height: 70vh;
+            }
+            
+            .explorer-sidebar {
+                width: 150px;
+            }
+            
+            .time-control {
+                bottom: 100px;
+                right: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Desktop Icons -->
+    <div class="desktop" id="desktop">
+        <div class="desktop-icon" ondblclick="openWindow('explorerWindow')">
+            <i class="fas fa-folder"></i>
+            <span>File Explorer</span>
+        </div>
+        <div class="desktop-icon" ondblclick="openWindow('browserWindow')">
+            <i class="fas fa-globe"></i>
+            <span>Browser</span>
+        </div>
+        <div class="desktop-icon" ondblclick="openWindow('settingsWindow')">
+            <i class="fas fa-cog"></i>
+            <span>Settings</span>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-menu-item" onclick="showNewFolderDialog()">
+            <i class="fas fa-folder-plus"></i>
+            <span>New Folder</span>
+        </div>
+        <div class="context-menu-item" onclick="showNewFileDialog()">
+            <i class="fas fa-file"></i>
+            <span>New File</span>
+        </div>
+        <div class="context-menu-item" onclick="openWindow('settingsWindow')">
+            <i class="fas fa-palette"></i>
+            <span>Display Settings</span>
+        </div>
+        <div class="context-menu-item" onclick="refreshDesktop()">
+            <i class="fas fa-sync-alt"></i>
+            <span>Refresh</span>
+        </div>
+    </div>
+
+    <!-- File Explorer Window -->
+    <div class="window explorer-window" id="explorerWindow">
+        <div class="window-header">
+            <span>File Explorer</span>
+            <div class="window-controls">
+                <div class="window-control close" onclick="closeWindow('explorerWindow')"></div>
+                <div class="window-control minimize"></div>
+                <div class="window-control maximize"></div>
+            </div>
+        </div>
+        <div class="explorer-sidebar">
+            <div style="padding: 10px 20px; font-weight: bold;">Quick Access</div>
+            <div class="context-menu-item" onclick="navigateTo('desktop')">
+                <i class="fas fa-desktop"></i>
+                <span>Desktop</span>
+            </div>
+            <div class="context-menu-item" onclick="navigateTo('downloads')">
+                <i class="fas fa-download"></i>
+                <span>Downloads</span>
+            </div>
+            <div class="context-menu-item" onclick="navigateTo('documents')">
+                <i class="fas fa-folder"></i>
+                <span>Documents</span>
+            </div>
+        </div>
+        <div class="explorer-content" id="explorerContent">
+            <!-- Dynamic content will be added here -->
+        </div>
+    </div>
+
+    <!-- New Folder Dialog -->
+    <div class="window dialog-window" id="newFolderDialog">
+        <div class="window-header">
+            <span>New Folder</span>
+            <div class="window-controls">
+                <div class="window-control close" onclick="closeWindow('newFolderDialog')"></div>
+            </div>
+        </div>
+        <div class="dialog-content">
+            <p>Enter the name for your new folder:</p>
+            <input type="text" class="dialog-input" id="folderNameInput" placeholder="Folder name">
+            <div class="dialog-buttons">
+                <button class="dialog-button" onclick="closeWindow('newFolderDialog')">Cancel</button>
+                <button class="dialog-button dialog-primary" onclick="createNewFolder()">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New File Dialog -->
+    <div class="window dialog-window" id="newFileDialog">
+        <div class="window-header">
+            <span>New File</span>
+            <div class="window-controls">
+                <div class="window-control close" onclick="closeWindow('newFileDialog')"></div>
+            </div>
+        </div>
+        <div class="dialog-content">
+            <p>Enter the name for your new file:</p>
+            <input type="text" class="dialog-input" id="fileNameInput" placeholder="File name">
+            <div class="dialog-buttons">
+                <button class="dialog-button" onclick="closeWindow('newFileDialog')">Cancel</button>
+                <button class="dialog-button dialog-primary" onclick="createNewFile()">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Window -->
+    <div class="window" id="settingsWindow" style="width: 600px; height: 400px;">
+        <div class="window-header">
+            <span>Settings</span>
+            <div class="window-controls">
+                <div class="window-control close" onclick="closeWindow('settingsWindow')"></div>
+                <div class="window-control minimize"></div>
+                <div class="window-control maximize"></div>
+            </div>
+        </div>
+        <div style="padding: 20px;">
+            <h3>System Settings</h3>
+            <div style="margin-top: 20px;">
+                <label>Theme:</label>
+                <select style="margin-left: 10px; padding: 5px; background: rgba(255,255,255,0.1); color: white; border: none; border-radius: 4px;">
+                    <option>Dark</option>
+                    <option>Light</option>
+                    <option>System</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Browser Window (Placeholder) -->
+    <div class="window" id="browserWindow" style="width: 800px; height: 600px; display: none;">
+        <div class="window-header">
+            <span>Browser</span>
+            <div class="window-controls">
+                <div class="window-control close" onclick="closeWindow('browserWindow')"></div>
+                <div class="window-control minimize"></div>
+                <div class="window-control maximize"></div>
+            </div>
+        </div>
+        <div style="padding: 20px; height: calc(100% - 45px);">
+            <p>Browser functionality would go here</p>
+        </div>
+    </div>
+
+    <!-- Time Controls -->
+    <div class="time-control">
+        <button class="time-button" onclick="setTime(6)">🌅 Dawn</button>
+        <button class="time-button" onclick="setTime(12)">🌞 Noon</button>
+        <button class="time-button" onclick="setTime(18)">🌇 Dusk</button>
+        <button class="time-button" onclick="setTime(0)">🌃 Midnight</button>
+        <button class="time-button" onclick="toggleRealTime()">
+            <span id="realTimeToggle">⏸ Pause</span>
+        </button>
+    </div>
+
+    <!-- Clock Display -->
+    <div class="clock" id="timeDisplay">12:00 AM</div>
+
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <div class="taskbar-icon" onclick="toggleStartMenu()">
+            <i class="fab fa-windows"></i>
+        </div>
+        <div class="taskbar-icon" onclick="openWindow('explorerWindow')">
+            <i class="fas fa-folder"></i>
+        </div>
+        <div class="taskbar-icon" onclick="openWindow('browserWindow')">
+            <i class="fas fa-globe"></i>
+        </div>
+    </div>
+
+    <script>
+        // File System Management
+        let fileSystem = {
+            desktop: [],
+            documents: [],
+            downloads: []
+        };
+        
+        let currentLocation = 'desktop';
+        let activeContextMenu = null;
+        let isRealTime = true;
+        let currentHour = new Date().getHours();
+        let backgroundInterval;
+        let activeWindow = null;
+        let isDragging = false;
+        let currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
+
+        // Initialize the interface
+        window.onload = function() {
+            // Position windows
+            document.getElementById('explorerWindow').style.left = '100px';
+            document.getElementById('explorerWindow').style.top = '100px';
+            document.getElementById('newFolderDialog').style.left = '300px';
+            document.getElementById('newFolderDialog').style.top = '200px';
+            document.getElementById('newFileDialog').style.left = '300px';
+            document.getElementById('newFileDialog').style.top = '200px';
+            document.getElementById('settingsWindow').style.left = '200px';
+            document.getElementById('settingsWindow').style.top = '150px';
+            document.getElementById('browserWindow').style.left = '150px';
+            document.getElementById('browserWindow').style.top = '50px';
+            
+            // Add sample files
+            fileSystem.desktop.push(
+                { name: 'Document.txt', type: 'file', icon: 'fa-file-alt', color: '#ffffff' },
+                { name: 'Image.jpg', type: 'file', icon: 'fa-file-image', color: '#4CAF50' }
+            );
+            
+            fileSystem.documents.push(
+                { name: 'Resume.docx', type: 'file', icon: 'fa-file-word', color: '#2196F3' },
+                { name: 'Budget.xlsx', type: 'file', icon: 'fa-file-excel', color: '#4CAF50' }
+            );
+            
+            fileSystem.downloads.push(
+                { name: 'Setup.exe', type: 'file', icon: 'fa-file-download', color: '#FF9800' }
+            );
+            
+            // Update views
+            updateExplorerContent();
+            updateDesktopView();
+            
+            // Start time cycle
+            startRealTimeCycle();
+        };
+
+        // Time Control System
+        function updateBackground(hour) {
+            let targetPosition = hour * (100/24);
+            document.body.style.backgroundPosition = `0% ${targetPosition}%`;
+            updateClockDisplay(hour);
+            adjustTextColor(hour);
+        }
+
+        function updateClockDisplay(hour) {
+            const minutes = Math.floor((currentHour % 1) * 60).toString().padStart(2, '0');
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const displayHour = hour % 12 || 12;
+            document.getElementById('timeDisplay').textContent = 
+                `${displayHour}:${minutes} ${ampm}`;
+        }
+
+        function setTime(hour) {
+            isRealTime = false;
+            currentHour = hour;
+            updateBackground(hour);
+            clearInterval(backgroundInterval);
+            document.body.style.animation = 'none';
+        }
+
+        function toggleRealTime() {
+            isRealTime = !isRealTime;
+            document.getElementById('realTimeToggle').textContent = 
+                isRealTime ? '⏸ Pause' : '▶ Resume';
+            
+            if (isRealTime) {
+                startRealTimeCycle();
+                document.body.style.animation = 'dayNightCycle 24s linear infinite';
+            } else {
+                clearInterval(backgroundInterval);
+                document.body.style.animation = 'none';
+            }
+        }
+
+        function startRealTimeCycle() {
+            backgroundInterval = setInterval(() => {
+                currentHour = new Date().getHours() + (new Date().getMinutes()/60);
+                updateBackground(currentHour);
+            }, 1000);
+        }
+
+        function adjustTextColor(hour) {
+            document.body.style.color = (hour > 6 && hour < 18) ? '#000' : '#fff';
+        }
+
+        // Window Management
+        function openWindow(windowId) {
+            document.getElementById(windowId).style.display = 'block';
+            bringToFront(windowId);
+        }
+
+        function closeWindow(windowId) {
+            document.getElementById(windowId).style.display = 'none';
+        }
+
+        function bringToFront(windowId) {
+            const windows = document.querySelectorAll('.window');
+            windows.forEach(window => {
+                window.style.zIndex = 1;
+            });
+            document.getElementById(windowId).style.zIndex = 100;
+            activeWindow = document.getElementById(windowId);
+        }
+
+        document.addEventListener('mousedown', (e) => {
+            if (e.target.closest('.window-header')) {
+                const window = e.target.closest('.window');
+                bringToFront(window.id);
+                
+                isDragging = true;
+                initialX = e.clientX - xOffset;
+                initialY = e.clientY - yOffset;
+
+                currentX = e.clientX;
+                currentY = e.clientY;
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging && activeWindow) {
+                e.preventDefault();
+                
+                currentX = e.clientX - initialX;
+                currentY = e.clientY - initialY;
+
+                xOffset = currentX;
+                yOffset = currentY;
+
+                activeWindow.style.left = currentX + 'px';
+                activeWindow.style.top = currentY + 'px';
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            initialX = currentX;
+            initialY = currentY;
+            isDragging = false;
+        });
+
+        // File System Functions
+        function showNewFolderDialog() {
+            hideContextMenu();
+            document.getElementById('folderNameInput').value = '';
+            openWindow('newFolderDialog');
+            document.getElementById('folderNameInput').focus();
+        }
+
+        function showNewFileDialog() {
+            hideContextMenu();
+            document.getElementById('fileNameInput').value = '';
+            openWindow('newFileDialog');
+            document.getElementById('fileNameInput').focus();
+        }
+
+        function createNewFolder() {
+            const folderName = document.getElementById('folderNameInput').value.trim();
+            if (folderName) {
+                const newFolder = {
+                    name: folderName,
+                    type: 'folder',
+                    icon: 'fa-folder',
+                    color: '#ffd700',
+                    date: new Date().toLocaleDateString()
+                };
+                
+                fileSystem[currentLocation].push(newFolder);
+                
+                // Update desktop if we're there
+                if (currentLocation === 'desktop') {
+                    addDesktopIcon(newFolder);
+                }
+                
+                updateExplorerContent();
+                closeWindow('newFolderDialog');
+            }
+        }
+
+        function createNewFile() {
+            const fileName = document.getElementById('fileNameInput').value.trim();
+            if (fileName) {
+                const newFile = {
+                    name: fileName,
+                    type: 'file',
+                    icon: 'fa-file',
+                    color: '#ffffff',
+                    date: new Date().toLocaleDateString()
+                };
+                
+                fileSystem[currentLocation].push(newFile);
+                
+                // Update desktop if we're there
+                if (currentLocation === 'desktop') {
+                    addDesktopIcon(newFile);
+                }
+                
+                updateExplorerContent();
+                closeWindow('newFileDialog');
+            }
+        }
+
+        function addDesktopIcon(item) {
+            const desktop = document.getElementById('desktop');
+            const newIcon = document.createElement('div');
+            newIcon.className = 'desktop-icon';
+            newIcon.innerHTML = `
+                <i class="fas ${item.icon}" style="color: ${item.color};"></i>
+                <span>${item.name}</span>
+            `;
+            desktop.appendChild(newIcon);
+        }
+
+        function updateExplorerContent() {
+            const explorerContent = document.getElementById('explorerContent');
+            explorerContent.innerHTML = '';
+
+            fileSystem[currentLocation].forEach(item => {
+                const element = document.createElement('div');
+                element.className = 'explorer-item';
+                element.innerHTML = `
+                    <i class="fas ${item.icon}" style="color: ${item.color};"></i>
+                    <span>${item.name}</span>
+                `;
+                explorerContent.appendChild(element);
+            });
+        }
+
+        function updateDesktopView() {
+            const desktop = document.getElementById('desktop');
+            desktop.innerHTML = '';
+            
+            fileSystem.desktop.forEach(item => {
+                addDesktopIcon(item);
+            });
+            
+            // Add default icons
+            const defaultIcons = [
+                { name: 'File Explorer', icon: 'fa-folder', color: '#0078d7', action: "openWindow('explorerWindow')" },
+                { name: 'Browser', icon: 'fa-globe', color: '#0078d7', action: "openWindow('browserWindow')" },
+                { name: 'Settings', icon: 'fa-cog', color: '#0078d7', action: "openWindow('settingsWindow')" }
+            ];
+            
+            defaultIcons.forEach(icon => {
+                const iconElement = document.createElement('div');
+                iconElement.className = 'desktop-icon';
+                iconElement.setAttribute('ondblclick', icon.action);
+                iconElement.innerHTML = `
+                    <i class="fas ${icon.icon}" style="color: ${icon.color};"></i>
+                    <span>${icon.name}</span>
+                `;
+                desktop.appendChild(iconElement);
+            });
+        }
+
+        function navigateTo(location) {
+            currentLocation = location;
+            updateExplorerContent();
+        }
+
+        function refreshDesktop() {
+            hideContextMenu();
+            updateDesktopView();
+        }
+
+        // Context Menu Management
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            hideContextMenu();
+            
+            const contextMenu = document.getElementById('contextMenu');
+            contextMenu.style.display = 'block';
+            contextMenu.style.left = `${e.clientX}px`;
+            contextMenu.style.top = `${e.clientY}px`;
+            activeContextMenu = contextMenu;
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.context-menu')) {
+                hideContextMenu();
+            }
+        });
+
+        function hideContextMenu() {
+            if (activeContextMenu) {
+                activeContextMenu.style.display = 'none';
+                activeContextMenu = null;
+            }
+        }
+
+        // Placeholder functions
+        function toggleStartMenu() {
+            // Start menu functionality would go here
+            console.log("Start menu clicked");
+        }
+    </script>
+
+    <noscript>
+        <style>
+            .taskbar, .window, .time-control, .desktop { display: none; }
+            body { background: #000; color: #fff; padding: 20px; }
+        </style>
+        <h1>Please enable JavaScript to experience the full interface</h1>
+    </noscript>
+</body>
+</html>
